@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <png.h>
 
+// Include stb_image_write implementation
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h" // Download and save in the same dir
+
 // Structure to hold image data
 typedef struct {
     unsigned int width;
@@ -166,4 +170,19 @@ int write_png_grayscale(const char *filename, unsigned char *data, int width, in
     fclose(fp);
 
     return 0; // Success
+}
+
+int save_png(const char *filename, unsigned char *data, int width, int height) {
+    if (!filename || !data || width <= 0 || height <= 0) {
+        fprintf(stderr, "[ERROR] save_png(): Invalid parameters to save_png\n");
+        return 0;
+    }
+    // stride_in_bytes = width * number_of_channels (RGBA = 4)
+    int stride_in_bytes = width * 4;
+    // stbi_write_png returns 1 on success, 0 on failure
+    if (!stbi_write_png(filename, width, height, 4, data, stride_in_bytes)) {
+        fprintf(stderr, "[ERROR] save_png(): Failed to write PNG file: %s\n", filename);
+        return 0;
+    }
+    return 1;
 }
